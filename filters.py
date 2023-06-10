@@ -39,6 +39,7 @@ class AttributeFilter:
     Concrete subclasses can override the `get` classmethod to provide custom
     behavior to fetch a desired attribute from the given `CloseApproach`.
     """
+
     def __init__(self, op, value):
         """Construct a new `AttributeFilter` from an binary predicate and a reference value.
 
@@ -68,7 +69,7 @@ class AttributeFilter:
         :return: The value of an attribute of interest, comparable to `self.value` via `self.op`.
         """
         raise UnsupportedCriterionError
-    
+
     @classmethod
     def eq(cls, value):
         """Create a filter instance that uses equality as comparison operator."""
@@ -84,34 +85,55 @@ class AttributeFilter:
         """Create a filter instance that uses `attribute >= value` as comparison operator."""
         return cls(operator.ge, value)
 
-
     def __repr__(self):
+        """Machine readable representation."""
         return f"{self.__class__.__name__}(op=operator.{self.op.__name__}, value={self.value})"
 
+
 class DateFilter(AttributeFilter):
+    """Get attribute of date from a close approach."""
+
     @classmethod
     def get(cls, approach):
+        """Get attribute of date from a close approach."""
         return approach.time.date()
 
+
 class DistanceFilter(AttributeFilter):
+    """Get attribute of distance from a close approach."""
+
     @classmethod
     def get(cls, approach):
+        """Get attribute of distance from a close approach."""
         return approach.distance
 
+
 class VelocityFilter(AttributeFilter):
+    """Get attribute of velocity from a close approach."""
+
     @classmethod
     def get(cls, approach):
+        """Get attribute of velocity from a close approach."""
         return approach.velocity
 
+
 class DiameterFilter(AttributeFilter):
+    """Get attribute of diameter from a close approach."""
+
     @classmethod
     def get(cls, approach):
+        """Get attribute of diameter from a close approach."""
         return approach.neo.diameter
 
-class HazardousFilter(AttributeFilter):        
+
+class HazardousFilter(AttributeFilter):
+    """Get attribute of being hazardous from a close approach."""
+
     @classmethod
     def get(cls, approach):
+        """Get attribute of being hazardous from a close approach."""
         return approach.neo.hazardous
+
 
 def create_filters(
         date=None, start_date=None, end_date=None,
@@ -149,7 +171,6 @@ def create_filters(
     :param hazardous: Whether the NEO of a matching `CloseApproach` is potentially hazardous.
     :return: A collection of filters for use with `query`.
     """
-    # TODO: Decide how you will represent your filters.
     filters = []
 
     def filter(val, filter_factory_method):
@@ -159,16 +180,16 @@ def create_filters(
     filter(date, DateFilter.eq)
     filter(start_date, DateFilter.ge)
     filter(end_date, DateFilter.le)
-    
+
     filter(distance_min, DistanceFilter.ge)
     filter(distance_max, DistanceFilter.le)
-    
+
     filter(velocity_min, VelocityFilter.ge)
     filter(velocity_max, VelocityFilter.le)
-    
+
     filter(diameter_min, DiameterFilter.ge)
     filter(diameter_max, DiameterFilter.le)
-    
+
     filter(hazardous, HazardousFilter.eq)
 
     return filters
@@ -183,7 +204,6 @@ def limit(iterator, n=None):
     :param n: The maximum number of values to produce.
     :yield: The first (at most) `n` values from the iterator.
     """
-    # TODO: Produce at most `n` values from the given iterator.
     if not n:
         return iterator
     else:
